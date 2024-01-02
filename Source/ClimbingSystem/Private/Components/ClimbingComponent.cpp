@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "ClimbHandlers/ClimbHandlerBase.h"
 
 // Sets default values for this component's properties
 UClimbingComponent::UClimbingComponent()
@@ -25,6 +26,17 @@ void UClimbingComponent::PostLoad()
 void UClimbingComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitClimbHandlers();
+}
+
+void UClimbingComponent::InitClimbHandlers()
+{
+	for (auto ClimbHandlerIt : ClimbHandlers)
+	{
+		ClimbHandlerIt.Value->ClimbingComponentBase = this;
+		ClimbHandlerIt.Value->Init();
+	}
 }
 
 // Called every frame
@@ -33,22 +45,6 @@ void UClimbingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UClimbingComponent::StartClimbUp(float EdgeZPos)
-{
-	float EdgeToCharacterCoof = GetEdgeToCharacterRatio(EdgeZPos);
-
-	for (const auto& ClimbUpMontage : ClimbUpMontages)
-	{
-		if (FMath::IsNearlyEqual(EdgeToCharacterCoof, ClimbUpMontage.Key, ClimbUpErrorTolerance))
-		{
-			OwnerCharacter->SetActorLocation(GetPositionToEdgeWithOffset(EdgeZPos, ClimbUpMontage.Key));
-
-			ClimbUp(ClimbUpMontage.Value);
-
-			break;
-		}
-	}
-}
 
 FVector UClimbingComponent::GetPositionToEdgeWithOffset(float EdgeZPos, float Offset)
 {
@@ -80,24 +76,9 @@ bool UClimbingComponent::CanHandleMovement()
 
 void UClimbingComponent::HandleMovement(FVector2D MovementVector)
 {
-	switch (CurrentClimbingType)
+	if (UClimbHandlerBase** ClimbHandlerPtr = ClimbHandlers.Find(CurrentClimbingType))
 	{
-	case EClimbingType::None:
-		break;
-	case EClimbingType::ClimbUp:
-		break;
-	case EClimbingType::Obstacle:
-		break;
-	case EClimbingType::FreeClimb:
-		HandleFreeClimbMovement(MovementVector);
-	case EClimbingType::SnuggleClimb:
-		break;
-	case EClimbingType::HangingOnHands:
-		break;
-	case EClimbingType::Ladder:
-		break;
-	default:
-		break;
+		MovementVector = (*ClimbHandlerPtr)->HandleMovement(MovementVector);
 	}
 
 	if (MovementVector.Length() != 0)

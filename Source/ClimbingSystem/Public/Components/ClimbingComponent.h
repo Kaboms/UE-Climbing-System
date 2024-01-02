@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameFramework/Character.h"
 #include "ClimbingComponent.generated.h"
+
+class UClimbHandlerBase;
 
 UENUM(BlueprintType)
 enum class EClimbingType : uint8
@@ -16,19 +19,6 @@ enum class EClimbingType : uint8
 	SnuggleClimb, // Climb along the wall snuggled to it
 	HangingOnHands,
 	Ladder
-};
-
-USTRUCT(BlueprintType)
-struct FClimbUpHandler
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float MinDistanceToEdge;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UAnimMontage* ClimbUpMontage;
 };
 
 UCLASS(Abstract, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -45,11 +35,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable)
-	void StartClimbUp(float EdgeZPos);
-
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ClimbUp(UAnimMontage* AnimMontage);
+	void EnableClimbingMode(EClimbingType ClimbingType);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DisableClimbingMode();
@@ -63,11 +50,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetEdgeToCharacterRatio(float EdgeZPos);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void  HandleFreeClimbMovement(UPARAM(ref) FVector2D& MoveDirection);
-
-	FORCEINLINE EClimbingType GetCurrentClimbingType() const { return CurrentClimbingType; }
-
 	UFUNCTION(BlueprintCallable)
 	bool CanHandleMovement();
 
@@ -76,9 +58,15 @@ public:
 
 	void StopMovement();
 
+	FORCEINLINE EClimbingType GetCurrentClimbingType() const { return CurrentClimbingType; }
+
+	ACharacter* GetOwnerCharacter() { return OwnerCharacter; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	virtual void InitClimbHandlers();
 
 	UFUNCTION(BlueprintImplementableEvent, Meta=(DisplayName = "Handle Movement"))
 	void ReceiveHandleMovement(FVector2D MovementVector);
@@ -90,16 +78,7 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<class ACharacter> OwnerCharacter;
-
-	// List of montages mapped to "Edge To Character Ratio"
-	// Montage will play if character ratio to edge is nealy (ClimbUpErrorTolerance) equal to map key
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TMap<float, UAnimMontage*> ClimbUpMontages;
-
-	// On Climb Up edge to character ratio error tolerance
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ClimbUpErrorTolerance = 0.1f;
+	TObjectPtr<ACharacter> OwnerCharacter;
 
 	// Character movement speed may be different when they walked and climbing
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -111,4 +90,6 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool ClimbingInTimeout = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced)
+	TMap<EClimbingType, UClimbHandlerBase*> ClimbHandlers;
 };
