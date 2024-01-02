@@ -18,20 +18,26 @@ class CLIMBINGSYSTEM_API UClimbHandlerBase : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Init();
+	virtual void Init();
 
 	UFUNCTION(BlueprintCallable)
-	void StartClimb(FHitResult HitResult);
+	virtual void EndClimb();
 
 	UFUNCTION(BlueprintCallable)
-	FVector2D HandleMovement(FVector2D MoveDirection);
+	virtual void StartClimb(FHitResult HitResult);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void HandleMovement(FVector2D MoveDirection);
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Init")
 	void ReceiveInit();
 
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "End Climb")
+	void ReceiveEndClimb();
+
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Handle Movement")
-	FVector2D ReceiveHandleMovement(FVector2D MoveDirection);
+	void ReceiveHandleMovement(FVector2D MoveDirection);
 
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Start Climb")
 	void ReceiveStartClimb(FHitResult HitResult);
@@ -39,4 +45,7 @@ protected:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	UClimbingComponent* ClimbingComponentBase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ClimbingSpeedScale = 1.0f;
 };

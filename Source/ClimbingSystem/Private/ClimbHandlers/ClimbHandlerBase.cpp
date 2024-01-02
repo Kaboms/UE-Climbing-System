@@ -8,12 +8,17 @@ void UClimbHandlerBase::Init()
     ReceiveInit();
 }
 
+void UClimbHandlerBase::EndClimb()
+{
+    ReceiveEndClimb();
+}
+
 void UClimbHandlerBase::StartClimb(FHitResult HitResult)
 {
     ReceiveStartClimb(HitResult);
 }
 
-FVector2D UClimbHandlerBase::HandleMovement(FVector2D MoveDirection)
+void UClimbHandlerBase::HandleMovement(FVector2D MoveDirection)
 {
-    return ReceiveHandleMovement(MoveDirection);
+    ReceiveHandleMovement(MoveDirection);
 }

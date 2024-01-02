@@ -23,7 +23,7 @@ public:
 
 public:
 	// List of montages mapped to "Edge To Character Ratio"
-	// Montage will play if character ratio to edge is nealy (ClimbUpErrorTolerance) equal to map key
+	// Montage will play if edge ratio character to is nealy (ClimbUpErrorTolerance) equal to map key
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TMap<float, UAnimMontage*> ClimbUpMontages;
 

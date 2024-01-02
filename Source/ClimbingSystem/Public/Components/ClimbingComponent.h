@@ -35,7 +35,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	void EnableClimbingMode(EClimbingType ClimbingType);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
@@ -43,7 +43,7 @@ public:
 
 	// If the offset equal zero - function return position where character bottom position will equal to edge.
 	// To get character center to edge - set offset to 0.5f
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	FVector GetPositionToEdgeWithOffset(float EdgeZPos, float Offset);
 	
 	// Return the ratio of the edge to character height where 0 is character capsule component bottom and 1 is top
@@ -54,9 +54,19 @@ public:
 	bool CanHandleMovement();
 
 	UFUNCTION(BlueprintCallable)
+	void AddMovementInput(FVector2D MovementVector, float MovementScale);
+
+	UFUNCTION(BlueprintCallable)
 	void HandleMovement(FVector2D MovementVector);
 
+	UFUNCTION(BlueprintCallable)
 	void StopMovement();
+
+	UFUNCTION(BlueprintCallable)
+	void SetTargetRotation(FRotator TargetRotation);
+
+	UFUNCTION(BlueprintCallable)
+	void SetTargetLocation(FVector TargetPosition);
 
 	FORCEINLINE EClimbingType GetCurrentClimbingType() const { return CurrentClimbingType; }
 
@@ -68,28 +78,53 @@ protected:
 
 	virtual void InitClimbHandlers();
 
+	UFUNCTION(BlueprintCallable)
+	void SmoothRotation();
+
+	UFUNCTION(BlueprintCallable)
+	void SmoothLocation();
+
 	UFUNCTION(BlueprintImplementableEvent, Meta=(DisplayName = "Handle Movement"))
 	void ReceiveHandleMovement(FVector2D MovementVector);
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Enable Climbing Mode")
+	void ReceiveEnableClimbingMode(EClimbingType ClimbingType);
 
 public:
 	// Character climbing movement controlled by this component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool ControlCharacterMovement = true;
 
+	UPROPERTY(EditAnywhere, Category = "Smooth")
+	float RotationSmoothAlpha = 0.15f;
+
+	FRotator TargetRotation;
+
+	bool SmoothRotationInProgress = false;
+
+	UPROPERTY(EditAnywhere, Category = "Smooth")
+	float LocationSmoothAlpha = 0.15f;
+
+	FVector TargetLocation;
+
+	bool SmoothLocationInProgress = false;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<ACharacter> OwnerCharacter;
 
-	// Character movement speed may be different when they walked and climbing
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float ClimbingSpeedScale = 1.0f;
-
 	UPROPERTY(BlueprintReadWrite)
 	EClimbingType CurrentClimbingType;
+
+	UPROPERTY(EditAnywhere)
+	TSet<EClimbingType> HandleMoveClimbingTypes;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool ClimbingInTimeout = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced)
 	TMap<EClimbingType, UClimbHandlerBase*> ClimbHandlers;
+
+	UPROPERTY(BlueprintReadWrite)
+	UClimbHandlerBase* CurrentClimbHandler;
 };
