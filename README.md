@@ -1,10 +1,10 @@
 # Climbing System
 
 Climb up on any objects.
-![ClimbUp](ClimbUp.gif)
+![ClimbUp](Docs/ClimbUp.gif)
 
 Climbing free like Spider Man
-![FreeClimb](FreeClimb.gif)
+![FreeClimb](Docs/FreeClimb.gif)
 
 Climbing using hands
-![ClimbByHands](ClimbByHands.gif)
+![ClimbByHands](Docs/ClimbByHands.gif)
