@@ -83,12 +83,43 @@ void UClimbingComponent::EnableClimbingMode(EClimbingType ClimbingType)
 {
 	CurrentClimbingType = ClimbingType;
 
+	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
+
 	if (UClimbHandlerBase** ClimbHandlerPtr = ClimbHandlers.Find(CurrentClimbingType))
 	{
 		CurrentClimbHandler = (*ClimbHandlerPtr);
 	}
 
+	if (ControlCharacterMovement)
+	{
+		UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
+		CharacterMovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
+		CharacterMovementComponent->StopMovementImmediately();
+	}
+
 	ReceiveEnableClimbingMode(ClimbingType);
+}
+
+void UClimbingComponent::DisableClimbingMode()
+{
+	CurrentClimbingType = EClimbingType::None;
+	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
+
+	SmoothRotationInProgress = false;
+	SmoothLocationInProgress = false;
+
+	if (IsValid(CurrentClimbHandler))
+	{
+		CurrentClimbHandler->EndClimb();
+		CurrentClimbHandler = nullptr;
+	}
+
+	if (ControlCharacterMovement)
+	{
+		UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
+		CharacterMovementComponent->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+	ReceiveDisableClimbingMode();
 }
 
 

@@ -21,6 +21,8 @@ enum class EClimbingType : uint8
 	Ladder
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FClimbingTypeChanged, EClimbingType, NewClimbingType);
+
 UCLASS(Abstract, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CLIMBINGSYSTEM_API UClimbingComponent : public UActorComponent
 {
@@ -38,7 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EnableClimbingMode(EClimbingType ClimbingType);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	void DisableClimbingMode();
 
 	// If the offset equal zero - function return position where character bottom position will equal to edge.
@@ -89,6 +91,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Enable Climbing Mode")
 	void ReceiveEnableClimbingMode(EClimbingType ClimbingType);
+	
+	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Disable Climbing Mode")
+	void ReceiveDisableClimbingMode();
 
 public:
 	// Character climbing movement controlled by this component
@@ -98,16 +103,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Smooth")
 	float RotationSmoothAlpha = 0.15f;
 
-	FRotator TargetRotation;
-
-	bool SmoothRotationInProgress = false;
-
 	UPROPERTY(EditAnywhere, Category = "Smooth")
 	float LocationSmoothAlpha = 0.15f;
 
-	FVector TargetLocation;
-
-	bool SmoothLocationInProgress = false;
+	UPROPERTY(BlueprintAssignable)
+	FClimbingTypeChanged OnClimbingTypeChanged;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -127,4 +127,10 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	UClimbHandlerBase* CurrentClimbHandler;
+
+	FRotator TargetRotation;
+	bool SmoothRotationInProgress = false;
+
+	FVector TargetLocation;
+	bool SmoothLocationInProgress = false;
 };
