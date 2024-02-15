@@ -24,7 +24,7 @@ public:
 	virtual void EndClimb();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void StartClimb(FHitResult HitResult);
+	virtual bool StartClimb(FHitResult HitResult);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void HandleMovement(FVector2D MoveDirection);
@@ -40,7 +40,7 @@ protected:
 	void ReceiveHandleMovement(FVector2D MoveDirection);
 
 	UFUNCTION(BlueprintImplementableEvent, DisplayName = "Start Climb")
-	void ReceiveStartClimb(FHitResult HitResult);
+	bool ReceiveStartClimb(FHitResult HitResult);
 
 public:
 	UPROPERTY(BlueprintReadOnly)

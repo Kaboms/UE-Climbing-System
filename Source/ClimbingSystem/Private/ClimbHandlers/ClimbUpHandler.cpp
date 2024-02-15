@@ -5,7 +5,7 @@
 #include "Components/ClimbingComponent.h"
 #include "GameFramework/Character.h"
 
-void UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)
+bool UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)
 {
 	float EdgeToCharacterCoof = ClimbingComponentBase->GetEdgeToCharacterRatio(EdgeZPos);
 
@@ -17,7 +17,9 @@ void UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)
 
 			ClimbUp(ClimbUpMontage.Value);
 
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }

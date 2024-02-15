@@ -13,9 +13,9 @@ void UClimbHandlerBase::EndClimb()
     ReceiveEndClimb();
 }
 
-void UClimbHandlerBase::StartClimb(FHitResult HitResult)
+bool UClimbHandlerBase::StartClimb(FHitResult HitResult)
 {
-    ReceiveStartClimb(HitResult);
+    return ReceiveStartClimb(HitResult);
 }
 
 void UClimbHandlerBase::HandleMovement(FVector2D MoveDirection)

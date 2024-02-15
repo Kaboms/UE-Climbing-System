@@ -28,6 +28,7 @@ void UClimbingComponent::BeginPlay()
 	Super::BeginPlay();
 
 	InitClimbHandlers();
+	SetupInputComponent();
 }
 
 void UClimbingComponent::InitClimbHandlers()
@@ -76,6 +77,38 @@ void UClimbingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	{
 		SmoothRotation();
 		SmoothLocation();
+	}
+}
+
+void UClimbingComponent::SetupInputComponent()
+{
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(OwnerCharacter->InputComponent))
+	{
+		//Jumping
+		EnhancedInputComponent->BindAction(ClimbimgInputConfig.JumpInputAction, ETriggerEvent::Triggered, this, &UClimbingComponent::OnJumpInput);
+
+		//Moving
+		EnhancedInputComponent->BindAction(ClimbimgInputConfig.MoveInputAction, ETriggerEvent::Triggered, this, &UClimbingComponent::OnMoveInput);
+		EnhancedInputComponent->BindAction(ClimbimgInputConfig.MoveInputAction, ETriggerEvent::Completed, this, &UClimbingComponent::StopMovement);
+	}
+}
+
+void UClimbingComponent::OnMoveInput(const FInputActionValue& Value)
+{
+	if (CanHandleMovement())
+	{
+		// Input is a Vector2D
+		FVector2D MovementVector = Value.Get<FVector2D>();
+
+		HandleMovement(MovementVector);
+	}
+}
+
+void UClimbingComponent::OnJumpInput()
+{
+	if (CanHandleMovement())
+	{
+		DisableClimbingMode();
 	}
 }
 
@@ -175,7 +208,10 @@ void UClimbingComponent::HandleMovement(FVector2D MovementVector)
 
 void UClimbingComponent::StopMovement()
 {
-	OwnerCharacter->GetMovementComponent()->StopMovementImmediately();
+	if (CanHandleMovement())
+	{
+		OwnerCharacter->GetMovementComponent()->StopMovementImmediately();
+	}
 }
 
 void UClimbingComponent::SetTargetRotation(FRotator InTargetRotation)

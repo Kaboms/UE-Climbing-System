@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Character.h"
+#include "EnhancedInputComponent.h"
+
 #include "ClimbingComponent.generated.h"
 
 class UClimbHandlerBase;
@@ -19,6 +21,19 @@ enum class EClimbingType : uint8
 	SnuggleClimb, // Climb along the wall snuggled to it
 	HangingOnHands,
 	Ladder
+};
+
+USTRUCT(BlueprintType)
+struct FClimbimgInputConfig
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<const UInputAction> MoveInputAction = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<const UInputAction> JumpInputAction = nullptr;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FClimbingTypeChanged, EClimbingType, NewClimbingType);
@@ -36,6 +51,12 @@ public:
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void SetupInputComponent();
+
+	void OnMoveInput(const FInputActionValue& Value);
+
+	void OnJumpInput();
 
 	UFUNCTION(BlueprintCallable)
 	void EnableClimbingMode(EClimbingType ClimbingType);
@@ -100,6 +121,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool ControlCharacterMovement = true;
 
+	// Should be setted by OwnerCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool CheckForClimbing = false;
+
 	UPROPERTY(EditAnywhere, Category = "Smooth")
 	float RotationSmoothAlpha = 0.15f;
 
@@ -133,4 +158,7 @@ protected:
 
 	FVector TargetLocation;
 	bool SmoothLocationInProgress = false;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	FClimbimgInputConfig ClimbimgInputConfig;
 };

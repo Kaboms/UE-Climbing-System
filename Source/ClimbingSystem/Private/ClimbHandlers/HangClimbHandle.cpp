@@ -14,6 +14,12 @@ void UHangClimbHandle::HandleMovement(FVector2D MoveDirection)
 
 		FVector2D SplineMoveDirection = MoveDirection;
 		SplineMoveDirection *= Side;
+		
+		if (FMath::IsNearlyZero(SplineMoveDirection.X))
+		{
+			ClimbingComponentBase->StopMovement();
+			return;
+		}
 
 		if ((SplineMoveDirection.X * CachedMoveDirection) > 0)
 		{
@@ -33,10 +39,11 @@ void UHangClimbHandle::HandleMovement(FVector2D MoveDirection)
 		else
 		{
 			// Move direction changed - get new move direction
+			ClimbingComponentBase->StopMovement();
 			GetNextMoveDirection(MoveDirection, CharacterSplineKey);
 		}
 
-		if (TargetSplineMoveDirection.Length() > MinMovementDistance && !TargetSplineMoveDirection.IsNearlyZero(0.1))
+		if (!TargetSplineMoveDirection.IsNearlyZero(0.1))
 		{
 			Character->AddMovementInput(TargetSplineMoveDirection * ClimbingSpeedScale);
 

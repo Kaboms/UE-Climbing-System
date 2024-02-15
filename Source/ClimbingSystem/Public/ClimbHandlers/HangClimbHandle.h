@@ -32,15 +32,13 @@ public:
 	void GetNextMoveDirection(FVector2D MoveDirection, float CharacterSplineKey);
 
 public:
+	// Character will stay on this distance to spline
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 CharacterToSplineDistance = 50;
 
 	// 0 is character capsule bottom and 1 is top
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ZCharacterOffset = 1.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MinMovementDistance = 40;
 
 protected:
 	UPROPERTY(BlueprintReadWrite)

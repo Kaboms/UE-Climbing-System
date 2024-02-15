@@ -16,14 +16,14 @@ class CLIMBINGSYSTEM_API UClimbUpHandler : public UClimbHandlerBase
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void FindAndStartClimbUp(float EdgeZPos);
+	bool FindAndStartClimbUp(float EdgeZPos);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ClimbUp(UAnimMontage* AnimMontage);
 
 public:
-	// List of montages mapped to "Edge To Character Ratio"
-	// Montage will play if edge ratio character to is nealy (ClimbUpErrorTolerance) equal to map key
+	// List of montages mapped to "Edge To Character Ratio" - 0 is bottom of character capsule and 1 is top
+	// Montage will play if edge to ratio character is nealy (ClimbUpErrorTolerance) equal to map key
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TMap<float, UAnimMontage*> ClimbUpMontages;
 
