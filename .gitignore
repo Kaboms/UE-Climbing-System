@@ -81,6 +81,3 @@ Builds/
 !Plugins/FMODStudio/Binaries/*/*.lib
 
 .idea/
-Content/FMOD/SonicTerror/.cache/
-Content/FMOD/SonicTerror/.unsaved/
-Content/FMOD/SonicTerror/.user/
