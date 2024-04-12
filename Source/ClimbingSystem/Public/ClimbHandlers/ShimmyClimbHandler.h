@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "ClimbHandlers/ClimbHandlerBase.h"
 #include "Components/SplineComponent.h"
-#include "HangClimbHandle.generated.h"
+#include "ShimmyClimbHandler.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CLIMBINGSYSTEM_API UHangClimbHandle : public UClimbHandlerBase
+class CLIMBINGSYSTEM_API UShimmyClimbHandler : public UClimbHandlerBase
 {
 	GENERATED_BODY()
 

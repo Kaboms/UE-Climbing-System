@@ -1,11 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ClimbHandlers/HangClimbHandle.h"
+#include "ClimbHandlers/ShimmyClimbHandler.h"
 #include "Components/ClimbingComponent.h"
 
-PRAGMA_DISABLE_OPTIMIZATION
-void UHangClimbHandle::HandleMovement(FVector2D MoveDirection)
+void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 {
 	if (IsValid(ClimbingSpline))
 	{
@@ -58,14 +57,14 @@ void UHangClimbHandle::HandleMovement(FVector2D MoveDirection)
 	}
 }
 
-void UHangClimbHandle::EndClimb()
+void UShimmyClimbHandler::EndClimb()
 {
 	Super::EndClimb();
 
 	ClimbingSpline = nullptr;
 }
 
-void UHangClimbHandle::SetupSplineComponent(USplineComponent* InClimbingSpline)
+void UShimmyClimbHandler::SetupSplineComponent(USplineComponent* InClimbingSpline)
 {
 	ClimbingSpline = InClimbingSpline;
 	ACharacter* Character = ClimbingComponentBase->GetOwnerCharacter();
@@ -87,7 +86,7 @@ void UHangClimbHandle::SetupSplineComponent(USplineComponent* InClimbingSpline)
 	NextLocationKey = 0;
 }
 
-void UHangClimbHandle::GetCharacterRotationAtSpline(float SplineKey, FRotator& Rotation)
+void UShimmyClimbHandler::GetCharacterRotationAtSpline(float SplineKey, FRotator& Rotation)
 {
 	if (!IsValid(ClimbingSpline))
 		return;
@@ -96,7 +95,7 @@ void UHangClimbHandle::GetCharacterRotationAtSpline(float SplineKey, FRotator& R
 	Rotation.Yaw -= 90 * Side;
 }
 
-void UHangClimbHandle::GetCharacterLocationAtSpline(float SplineKey, FVector& Location)
+void UShimmyClimbHandler::GetCharacterLocationAtSpline(float SplineKey, FVector& Location)
 {
 	if (!IsValid(ClimbingSpline))
 		return;
@@ -113,7 +112,7 @@ void UHangClimbHandle::GetCharacterLocationAtSpline(float SplineKey, FVector& Lo
 	Location.Z = ClimbingComponentBase->GetPositionToEdgeWithOffset(Location.Z, ZCharacterOffset).Z;
 }
 
-void UHangClimbHandle::GetNextMoveDirection(FVector2D MoveDirection, float CharacterSplineKey)
+void UShimmyClimbHandler::GetNextMoveDirection(FVector2D MoveDirection, float CharacterSplineKey)
 {
 	CachedMoveDirection = (MoveDirection.X > 0 ? 1 : -1) * Side;
 
@@ -124,4 +123,3 @@ void UHangClimbHandle::GetNextMoveDirection(FVector2D MoveDirection, float Chara
 	TargetSplineMoveDirection = NextLocation - ClimbingComponentBase->GetOwnerCharacter()->GetActorLocation();
 	TargetSplineMoveDirection.Normalize();
 }
-PRAGMA_ENABLE_OPTIMIZATION

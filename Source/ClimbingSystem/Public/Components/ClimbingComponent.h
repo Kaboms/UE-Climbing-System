@@ -19,7 +19,7 @@ enum class EClimbingType : uint8
 	Obstacle, // Climb over obstacles while running
 	FreeClimb, // Climb (crawn) on Object surface like Spider Man
 	SnuggleClimb, // Climb along the wall snuggled to it
-	HangingOnHands,
+	ShimmyClimb, // Shimmy by hands
 	Ladder
 };
 
@@ -102,10 +102,13 @@ protected:
 	virtual void InitClimbHandlers();
 
 	UFUNCTION(BlueprintCallable)
-	void SmoothRotation();
+	void SmoothRotation(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
-	void SmoothLocation();
+	void SmoothLocation(float DeltaTime);
+
+	UFUNCTION(BlueprintPure)
+	bool SmoothTranslationInProgress();
 
 	UFUNCTION(BlueprintImplementableEvent, Meta=(DisplayName = "Handle Movement"))
 	void ReceiveHandleMovement(FVector2D MovementVector);
@@ -126,10 +129,12 @@ public:
 	bool CheckForClimbing = false;
 
 	UPROPERTY(EditAnywhere, Category = "Smooth")
-	float RotationSmoothAlpha = 0.15f;
+	float RotationSmoothSpeed = 0.15f;
+
+	float RotationSmoothAlpha = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Smooth")
-	float LocationSmoothAlpha = 0.15f;
+	float LocationSmoothSpeed = 0.15f;
 
 	UPROPERTY(BlueprintAssignable)
 	FClimbingTypeChanged OnClimbingTypeChanged;
@@ -143,6 +148,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSet<EClimbingType> HandleMoveClimbingTypes;
+
+	bool ClimbingTypeHandleMovement = false;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool ClimbingInTimeout = false;
