@@ -15,11 +15,16 @@ UENUM(BlueprintType)
 enum class EClimbingType : uint8
 {
 	None,
-	ClimbUp, // Just climb up on Object
-	Obstacle, // Climb over obstacles while running
-	FreeClimb, // Climb (crawn) on Object surface like Spider Man
-	SnuggleClimb, // Climb along the wall snuggled to it
-	ShimmyClimb, // Shimmy by hands
+	// Just climb up on Object
+	ClimbUp,
+	// Climb over obstacles while running
+	Obstacle,
+	// Climb (crawn) on Object surface like Spider Man
+	FreeClimb,
+	// Climb along the wall snuggled to it
+	SnuggleClimb,
+	// Shimmy by hands
+	ShimmyClimb,
 	Ladder
 };
 

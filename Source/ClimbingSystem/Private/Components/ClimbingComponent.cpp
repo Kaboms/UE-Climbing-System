@@ -89,6 +89,9 @@ void UClimbingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 void UClimbingComponent::SetupInputComponent()
 {
+	if (!IsValid(OwnerCharacter->InputComponent))
+		return;
+
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(OwnerCharacter->InputComponent))
 	{
 		//Jumping
