@@ -13,7 +13,7 @@ bool UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)
 	{
 		if (FMath::IsNearlyEqual(EdgeToCharacterCoof, ClimbUpMontage.Key, ClimbUpErrorTolerance))
 		{
-			ClimbingComponentBase->GetOwnerCharacter()->SetActorLocation(ClimbingComponentBase->GetPositionToEdgeWithOffset(EdgeZPos, ClimbUpMontage.Key));
+			ClimbingComponentBase->SetTargetLocation(ClimbingComponentBase->GetPositionToEdgeWithOffset(EdgeZPos, ClimbUpMontage.Key));
 
 			ClimbUp(ClimbUpMontage.Value);
 

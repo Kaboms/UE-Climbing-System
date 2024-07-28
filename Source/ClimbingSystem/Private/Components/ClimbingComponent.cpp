@@ -230,13 +230,27 @@ void UClimbingComponent::StopMovement()
 
 void UClimbingComponent::SetTargetRotation(FRotator InTargetRotation)
 {
-	SmoothRotationInProgress = true;
-	RotationSmoothAlpha = 0.0f;
-	TargetRotation = InTargetRotation;
+	if (RotationSmoothSpeed > 0)
+	{
+		SmoothRotationInProgress = true;
+		RotationSmoothAlpha = 0.0f;
+		TargetRotation = InTargetRotation;
+	}
+	else
+	{
+		OwnerCharacter->SetActorRotation(InTargetRotation);
+	}
 }
 
 void UClimbingComponent::SetTargetLocation(FVector InTargetLocation)
 {
-	SmoothLocationInProgress = true;
-	TargetLocation = InTargetLocation;
+	if (LocationSmoothSpeed > 0)
+	{
+		SmoothLocationInProgress = true;
+		TargetLocation = InTargetLocation;
+	}
+	else
+	{
+		OwnerCharacter->SetActorLocation(InTargetLocation);
+	}
 }
