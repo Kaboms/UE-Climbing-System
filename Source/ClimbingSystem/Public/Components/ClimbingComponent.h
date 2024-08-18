@@ -138,6 +138,7 @@ public:
 
 	float RotationSmoothAlpha = 0.0f;
 
+	// TODO Smooth move to location broke climb up
 	UPROPERTY(EditAnywhere, Category = "Smooth")
 	float LocationSmoothSpeed = 0.15f;
 
