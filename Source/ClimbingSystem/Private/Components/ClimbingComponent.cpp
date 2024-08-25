@@ -13,6 +13,8 @@ UClimbingComponent::UClimbingComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	bAutoActivate = true;
 }
 
 void UClimbingComponent::PostLoad()
@@ -80,6 +82,9 @@ void UClimbingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!IsActive())
+		return;
+
 	if (CurrentClimbingType != EClimbingType::None)
 	{
 		SmoothRotation(DeltaTime);
@@ -124,6 +129,9 @@ void UClimbingComponent::OnJumpInput()
 
 void UClimbingComponent::EnableClimbingMode(EClimbingType ClimbingType)
 {
+	if (!IsActive())
+		return;
+
 	CurrentClimbingType = ClimbingType;
 
 	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
@@ -195,11 +203,14 @@ float UClimbingComponent::GetEdgeToCharacterRatio(float EdgeZPos)
 
 bool UClimbingComponent::CanHandleMovement()
 {
-	return ControlCharacterMovement && ClimbingTypeHandleMovement;
+	return IsActive() && ControlCharacterMovement && ClimbingTypeHandleMovement;
 }
 
 void UClimbingComponent::AddMovementInput(FVector2D MovementVector, float MovementScale)
 {
+	if (!IsActive())
+		return;
+
 	const FRotator Rotation = OwnerCharacter->GetActorRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -212,6 +223,9 @@ void UClimbingComponent::AddMovementInput(FVector2D MovementVector, float Moveme
 
 void UClimbingComponent::HandleMovement(FVector2D MovementVector)
 {
+	if (!IsActive())
+		return;
+
 	if (IsValid(CurrentClimbHandler))
 	{
 		CurrentClimbHandler->HandleMovement(MovementVector);
