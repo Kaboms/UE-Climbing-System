@@ -8,7 +8,7 @@ void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 {
 	if (IsValid(ClimbingSpline))
 	{
-		ACharacter* Character = ClimbingComponentBase->GetOwnerCharacter();
+		ACharacter* Character = ClimbingComponent->GetOwnerCharacter();
 		float CharacterSplineKey = ClimbingSpline->FindInputKeyClosestToWorldLocation(Character->GetActorLocation());
 
 		FVector2D SplineMoveDirection = MoveDirection;
@@ -16,7 +16,7 @@ void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 		
 		if (FMath::IsNearlyZero(SplineMoveDirection.X))
 		{
-			ClimbingComponentBase->StopMovement();
+			ClimbingComponent->StopMovement();
 			return;
 		}
 
@@ -25,7 +25,7 @@ void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 			// Move direction not changed
 			if ((SplineMoveDirection.X < 0 && CharacterSplineKey <= 0) || (SplineMoveDirection.X > 0 && CharacterSplineKey >= ClimbingSpline->GetNumberOfSplineSegments()))
 			{
-				ClimbingComponentBase->StopMovement();
+				ClimbingComponent->StopMovement();
 				return;
 			}
 
@@ -38,7 +38,7 @@ void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 		else
 		{
 			// Move direction changed - get new move direction
-			ClimbingComponentBase->StopMovement();
+			ClimbingComponent->StopMovement();
 			GetNextMoveDirection(MoveDirection, CharacterSplineKey);
 		}
 
@@ -48,11 +48,11 @@ void UShimmyClimbHandler::HandleMovement(FVector2D MoveDirection)
 
 			FRotator Rotation;
 			GetCharacterRotationAtSpline(CharacterSplineKey, Rotation);
-			ClimbingComponentBase->SetTargetRotation(Rotation);
+			ClimbingComponent->SetTargetRotation(Rotation);
 		}
 		else
 		{
-			ClimbingComponentBase->StopMovement();
+			ClimbingComponent->StopMovement();
 		}
 	}
 }
@@ -67,7 +67,7 @@ void UShimmyClimbHandler::EndClimb()
 void UShimmyClimbHandler::SetupSplineComponent(USplineComponent* InClimbingSpline)
 {
 	ClimbingSpline = InClimbingSpline;
-	ACharacter* Character = ClimbingComponentBase->GetOwnerCharacter();
+	ACharacter* Character = ClimbingComponent->GetOwnerCharacter();
 	FVector CharacterLocation = Character->GetActorLocation();
 
 	float CharacterSplineKey = ClimbingSpline->FindInputKeyClosestToWorldLocation(CharacterLocation);
@@ -109,7 +109,7 @@ void UShimmyClimbHandler::GetCharacterLocationAtSpline(float SplineKey, FVector&
 	ForwardVector *= CharacterToSplineDistance;
 
 	Location = SplineLocation + ForwardVector;
-	Location.Z = ClimbingComponentBase->GetPositionToEdgeWithOffset(Location.Z, ZCharacterOffset).Z;
+	Location.Z = ClimbingComponent->GetPositionToEdgeWithOffset(Location.Z, ZCharacterOffset).Z;
 }
 
 void UShimmyClimbHandler::GetNextMoveDirection(FVector2D MoveDirection, float CharacterSplineKey)
@@ -120,6 +120,6 @@ void UShimmyClimbHandler::GetNextMoveDirection(FVector2D MoveDirection, float Ch
 	FVector NextLocation;
 	GetCharacterLocationAtSpline(NextLocationKey, NextLocation);
 
-	TargetSplineMoveDirection = NextLocation - ClimbingComponentBase->GetOwnerCharacter()->GetActorLocation();
+	TargetSplineMoveDirection = NextLocation - ClimbingComponent->GetOwnerCharacter()->GetActorLocation();
 	TargetSplineMoveDirection.Normalize();
 }

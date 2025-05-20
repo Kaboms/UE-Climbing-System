@@ -42,6 +42,8 @@ public:
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FClimbingTypeChanged, EClimbingType, NewClimbingType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSmoothRotationFinished);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSmoothLocationFinished);
 
 UCLASS(Abstract, Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CLIMBINGSYSTEM_API UClimbingComponent : public UActorComponent
@@ -100,6 +102,31 @@ public:
 
 	ACharacter* GetOwnerCharacter() { return OwnerCharacter; }
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void GetEdge(const FHitResult& Hit, FHitResult& OutHit, bool& EdgeIsSameActor);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void GetActorForwardTrace(double TraceDistance, float AngleDeg, FVector RotationAxis, FVector2D Offset, FVector& TraceStart, FVector& TraceEnd);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	FVector GetMoveTrace(FVector2D MoveDirection, FVector2D Distance);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	bool CheckTraceTimeout();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void HandleHit(FHitResult HitResult, EClimbingType& SurfaceClimbingType, bool& Result);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void TraceForClimbing(bool& Result);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void HandleClimbingType(FHitResult HitResult, EClimbingType ClimbingType, bool& Result);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ForceCheckClimbing(bool& Result);
+
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -134,16 +161,25 @@ public:
 	bool CheckForClimbing = false;
 
 	UPROPERTY(EditAnywhere, Category = "Smooth")
-	float RotationSmoothSpeed = 0.15f;
+	float RotationSmoothSpeed = 10;
 
 	float RotationSmoothAlpha = 0.0f;
 
 	// TODO Smooth move to location broke climb up
 	UPROPERTY(EditAnywhere, Category = "Smooth")
-	float LocationSmoothSpeed = 0.15f;
+	float LocationSmoothSpeed = 10;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Climb Trace")
+	TEnumAsByte<ETraceTypeQuery> TraceChannel;
 
 	UPROPERTY(BlueprintAssignable)
 	FClimbingTypeChanged OnClimbingTypeChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FSmoothRotationFinished OnSmoothRotationFinished;
+
+	UPROPERTY(BlueprintAssignable)
+	FSmoothLocationFinished OnSmoothLocationFinished;
 
 protected:
 	UPROPERTY(BlueprintReadOnly)

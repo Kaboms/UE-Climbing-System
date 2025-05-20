@@ -37,7 +37,7 @@ void UClimbingComponent::InitClimbHandlers()
 {
 	for (auto ClimbHandlerIt : ClimbHandlers)
 	{
-		ClimbHandlerIt.Value->ClimbingComponentBase = this;
+		ClimbHandlerIt.Value->ClimbingComponent = this;
 		ClimbHandlerIt.Value->Init();
 	}
 }
@@ -53,7 +53,11 @@ void UClimbingComponent::SmoothRotation(float DeltaTime)
 
 		OwnerCharacter->SetActorRotation(FQuat::Slerp(AQuat, BQuat, RotationSmoothAlpha));
 		
-		SmoothRotationInProgress = !OwnerCharacter->GetActorRotation().Equals(TargetRotation, 0.1f);
+		if (!OwnerCharacter->GetActorRotation().Equals(TargetRotation, 0.1f))
+		{
+			SmoothRotationInProgress = false;
+			OnSmoothRotationFinished.Broadcast();
+		}
 	}
 }
 
@@ -68,6 +72,7 @@ void UClimbingComponent::SmoothLocation(float DeltaTime)
 		else
 		{
 			SmoothLocationInProgress = false;
+			OnSmoothLocationFinished.Broadcast();
 		}
 	}
 }
@@ -121,7 +126,7 @@ void UClimbingComponent::OnMoveInput(const FInputActionValue& Value)
 
 void UClimbingComponent::OnJumpInput()
 {
-	if (CanHandleMovement())
+	if (CanHandleMovement() && IsValid(CurrentClimbHandler) && CurrentClimbHandler->InterruptByJump)
 	{
 		DisableClimbingMode();
 	}
@@ -133,8 +138,6 @@ void UClimbingComponent::EnableClimbingMode(EClimbingType ClimbingType)
 		return;
 
 	CurrentClimbingType = ClimbingType;
-
-	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
 
 	if (UClimbHandlerBase** ClimbHandlerPtr = ClimbHandlers.Find(CurrentClimbingType))
 	{
@@ -155,6 +158,8 @@ void UClimbingComponent::EnableClimbingMode(EClimbingType ClimbingType)
 	}
 
 	ReceiveEnableClimbingMode(ClimbingType);
+
+	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
 }
 
 void UClimbingComponent::DisableClimbingMode()
@@ -253,6 +258,7 @@ void UClimbingComponent::SetTargetRotation(FRotator InTargetRotation)
 	else
 	{
 		OwnerCharacter->SetActorRotation(InTargetRotation);
+		OnSmoothRotationFinished.Broadcast();
 	}
 }
 
@@ -266,5 +272,6 @@ void UClimbingComponent::SetTargetLocation(FVector InTargetLocation)
 	else
 	{
 		OwnerCharacter->SetActorLocation(InTargetLocation);
+		OnSmoothLocationFinished.Broadcast();
 	}
 }

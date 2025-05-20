@@ -5,21 +5,36 @@
 #include "Components/ClimbingComponent.h"
 #include "GameFramework/Character.h"
 
+UClimbUpHandler::UClimbUpHandler() : Super()
+{
+	InterruptByJump = false;
+}
+
 bool UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)
 {
-	float EdgeToCharacterCoof = ClimbingComponentBase->GetEdgeToCharacterRatio(EdgeZPos);
+	float EdgeToCharacterCoof = ClimbingComponent->GetEdgeToCharacterRatio(EdgeZPos);
 
 	for (const auto& ClimbUpMontage : ClimbUpMontages)
 	{
 		if (FMath::IsNearlyEqual(EdgeToCharacterCoof, ClimbUpMontage.Key, ClimbUpErrorTolerance))
 		{
-			ClimbingComponentBase->SetTargetLocation(ClimbingComponentBase->GetPositionToEdgeWithOffset(EdgeZPos, ClimbUpMontage.Key));
+			CurrentClimbUpMontage = ClimbUpMontage.Value;
 
-			ClimbUp(ClimbUpMontage.Value);
+			ClimbingComponent->OnSmoothLocationFinished.AddDynamic(this, &ThisClass::OnSmoothLocationFinished);
+
+			ClimbUp(CurrentClimbUpMontage);
+
+			ClimbingComponent->SetTargetLocation(ClimbingComponent->GetPositionToEdgeWithOffset(EdgeZPos, ClimbUpMontage.Key));
 
 			return true;
 		}
 	}
 
 	return false;
+}
+
+void UClimbUpHandler::OnSmoothLocationFinished_Implementation()
+{
+	ClimbingComponent->OnSmoothLocationFinished.RemoveDynamic(this, &ThisClass::OnSmoothLocationFinished);
+	CurrentClimbUpMontage = nullptr;
 }

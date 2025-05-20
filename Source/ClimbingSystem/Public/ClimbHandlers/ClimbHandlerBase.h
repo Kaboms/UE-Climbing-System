@@ -44,8 +44,11 @@ protected:
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	UClimbingComponent* ClimbingComponentBase;
+	UClimbingComponent* ClimbingComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ClimbingSpeedScale = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InterruptByJump = true;
 };

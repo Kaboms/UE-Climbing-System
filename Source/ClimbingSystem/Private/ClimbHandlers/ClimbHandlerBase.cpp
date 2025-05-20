@@ -2,6 +2,7 @@
 
 
 #include "ClimbHandlers/ClimbHandlerBase.h"
+#include "Components/ClimbingComponent.h"
 
 void UClimbHandlerBase::Init()
 {
