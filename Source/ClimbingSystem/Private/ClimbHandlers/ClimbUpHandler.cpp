@@ -7,7 +7,7 @@
 
 UClimbUpHandler::UClimbUpHandler() : Super()
 {
-	InterruptByJump = false;
+	bInterruptByJump = false;
 }
 
 bool UClimbUpHandler::FindAndStartClimbUp(float EdgeZPos)

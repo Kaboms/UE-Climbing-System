@@ -50,5 +50,5 @@ public:
 	float ClimbingSpeedScale = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InterruptByJump = true;
+	bool bInterruptByJump = true;
 };

@@ -44,7 +44,7 @@ void UClimbingComponent::InitClimbHandlers()
 
 void UClimbingComponent::SmoothRotation(float DeltaTime)
 {
-	if (SmoothRotationInProgress)
+	if (bSmoothRotationInProgress)
 	{
 		FQuat AQuat(OwnerCharacter->GetActorRotation());
 		FQuat BQuat(TargetRotation);
@@ -55,7 +55,7 @@ void UClimbingComponent::SmoothRotation(float DeltaTime)
 		
 		if (!OwnerCharacter->GetActorRotation().Equals(TargetRotation, 0.1f))
 		{
-			SmoothRotationInProgress = false;
+			bSmoothRotationInProgress = false;
 			OnSmoothRotationFinished.Broadcast();
 		}
 	}
@@ -63,7 +63,7 @@ void UClimbingComponent::SmoothRotation(float DeltaTime)
 
 void UClimbingComponent::SmoothLocation(float DeltaTime)
 {
-	if (SmoothLocationInProgress)
+	if (bSmoothLocationInProgress)
 	{
 		if (!OwnerCharacter->GetActorLocation().Equals(TargetLocation, 2.0f))
 		{
@@ -71,7 +71,7 @@ void UClimbingComponent::SmoothLocation(float DeltaTime)
 		}
 		else
 		{
-			SmoothLocationInProgress = false;
+			bSmoothLocationInProgress = false;
 			OnSmoothLocationFinished.Broadcast();
 		}
 	}
@@ -79,7 +79,7 @@ void UClimbingComponent::SmoothLocation(float DeltaTime)
 
 bool UClimbingComponent::SmoothTranslationInProgress()
 {
-	return SmoothLocationInProgress || SmoothLocationInProgress;
+	return bSmoothLocationInProgress || bSmoothLocationInProgress;
 }
 
 // Called every frame
@@ -126,7 +126,7 @@ void UClimbingComponent::OnMoveInput(const FInputActionValue& Value)
 
 void UClimbingComponent::OnJumpInput()
 {
-	if (CanHandleMovement() && IsValid(CurrentClimbHandler) && CurrentClimbHandler->InterruptByJump)
+	if (CanHandleMovement() && IsValid(CurrentClimbHandler) && CurrentClimbHandler->bInterruptByJump)
 	{
 		DisableClimbingMode();
 	}
@@ -148,13 +148,13 @@ void UClimbingComponent::EnableClimbingMode(EClimbingType ClimbingType)
 		checkNoEntry();
 	}
 
-	if (ControlCharacterMovement)
+	if (bControlCharacterMovement)
 	{
 		UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
 		CharacterMovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
 		CharacterMovementComponent->StopMovementImmediately();
 
-		ClimbingTypeHandleMovement = HandleMoveClimbingTypes.Contains(CurrentClimbingType);
+		bClimbingTypeHandleMovement = HandleMoveClimbingTypes.Contains(CurrentClimbingType);
 	}
 
 	ReceiveEnableClimbingMode(ClimbingType);
@@ -167,14 +167,14 @@ void UClimbingComponent::DisableClimbingMode()
 	CurrentClimbingType = EClimbingType::None;
 	OnClimbingTypeChanged.Broadcast(CurrentClimbingType);
 
-	SmoothRotationInProgress = false;
-	SmoothLocationInProgress = false;
-	ClimbingTypeHandleMovement = false;
+	bSmoothRotationInProgress = false;
+	bSmoothLocationInProgress = false;
+	bClimbingTypeHandleMovement = false;
 
 	CurrentClimbHandler->EndClimb();
 	CurrentClimbHandler = nullptr;
 
-	if (ControlCharacterMovement)
+	if (bControlCharacterMovement)
 	{
 		UCharacterMovementComponent* CharacterMovementComponent = OwnerCharacter->GetCharacterMovement();
 		CharacterMovementComponent->SetMovementMode(EMovementMode::MOVE_Walking);
@@ -208,7 +208,7 @@ float UClimbingComponent::GetEdgeToCharacterRatio(float EdgeZPos)
 
 bool UClimbingComponent::CanHandleMovement()
 {
-	return IsActive() && ControlCharacterMovement && ClimbingTypeHandleMovement;
+	return IsActive() && bControlCharacterMovement && bClimbingTypeHandleMovement;
 }
 
 void UClimbingComponent::AddMovementInput(FVector2D MovementVector, float MovementScale)
@@ -251,7 +251,7 @@ void UClimbingComponent::SetTargetRotation(FRotator InTargetRotation)
 {
 	if (RotationSmoothSpeed > 0)
 	{
-		SmoothRotationInProgress = true;
+		bSmoothRotationInProgress = true;
 		RotationSmoothAlpha = 0.0f;
 		TargetRotation = InTargetRotation;
 	}
@@ -266,7 +266,7 @@ void UClimbingComponent::SetTargetLocation(FVector InTargetLocation)
 {
 	if (LocationSmoothSpeed > 0)
 	{
-		SmoothLocationInProgress = true;
+		bSmoothLocationInProgress = true;
 		TargetLocation = InTargetLocation;
 	}
 	else

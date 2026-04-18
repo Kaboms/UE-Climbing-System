@@ -103,7 +103,7 @@ public:
 	ACharacter* GetOwnerCharacter() { return OwnerCharacter; }
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void GetEdge(const FHitResult& Hit, FHitResult& OutHit, bool& EdgeIsSameActor);
+	void GetEdge(const FHitResult& Hit, FHitResult& OutHit, bool& bEdgeIsSameActor);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void GetActorForwardTrace(double TraceDistance, float AngleDeg, FVector RotationAxis, FVector2D Offset, FVector& TraceStart, FVector& TraceEnd);
@@ -112,20 +112,16 @@ public:
 	FVector GetMoveTrace(FVector2D MoveDirection, FVector2D Distance);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	bool CheckTraceTimeout();
+	void HandleHit(FHitResult HitResult, EClimbingType& SurfaceClimbingType, bool& bResult);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void HandleHit(FHitResult HitResult, EClimbingType& SurfaceClimbingType, bool& Result);
+	void TraceForClimbing(bool& bResult);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void TraceForClimbing(bool& Result);
+	void HandleClimbingType(FHitResult HitResult, EClimbingType ClimbingType, bool& bResult);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void HandleClimbingType(FHitResult HitResult, EClimbingType ClimbingType, bool& Result);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ForceCheckClimbing(bool& Result);
-
+	void ForceCheckClimbing(bool& bResult);
 
 protected:
 	// Called when the game starts
@@ -154,11 +150,11 @@ protected:
 public:
 	// Character climbing movement controlled by this component
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool ControlCharacterMovement = true;
+	bool bControlCharacterMovement = true;
 
 	// Should be setted by OwnerCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool CheckForClimbing = false;
+	bool bCheckForClimbing = false;
 
 	UPROPERTY(EditAnywhere, Category = "Smooth")
 	float RotationSmoothSpeed = 10;
@@ -191,10 +187,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TSet<EClimbingType> HandleMoveClimbingTypes;
 
-	bool ClimbingTypeHandleMovement = false;
-
 	UPROPERTY(BlueprintReadWrite)
-	bool ClimbingInTimeout = false;
+	bool bClimbingInTimeout = false;
+
+	bool bClimbingTypeHandleMovement = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced)
 	TMap<EClimbingType, UClimbHandlerBase*> ClimbHandlers;
@@ -203,10 +199,10 @@ protected:
 	UClimbHandlerBase* CurrentClimbHandler;
 
 	FRotator TargetRotation;
-	bool SmoothRotationInProgress = false;
+	bool bSmoothRotationInProgress = false;
 
 	FVector TargetLocation;
-	bool SmoothLocationInProgress = false;
+	bool bSmoothLocationInProgress = false;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	FClimbimgInputConfig ClimbimgInputConfig;
